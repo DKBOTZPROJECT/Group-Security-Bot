@@ -102,7 +102,13 @@ async def dkbotz_guard_group(client, message: Message):
 
     reason = None
 
-    if message.reply_markup:
+    if await is_admin(client, message.chat.id, message.from_user.id):
+        return
+
+    if message.from_user.is_bot:
+        reason += " (🤖 Bot detected)"
+        
+    elif message.reply_markup:
         reason = "❌ Buttons are not allowed here!"
 
     elif ALL_LINKS and URL_REGEX.search(original_text):
@@ -116,12 +122,6 @@ async def dkbotz_guard_group(client, message: Message):
 
     if not reason:
         return
-
-    if await is_admin(client, message.chat.id, message.from_user.id):
-        return
-
-    if message.from_user.is_bot:
-        reason += " (🤖 Bot detected)"
 
     try:
         await message.delete()
